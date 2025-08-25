@@ -1,5 +1,9 @@
 import { expect, Page } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Define an interface for the context passed to step functions
 interface BddContext {
@@ -9,12 +13,13 @@ interface BddContext {
 const { Given, When, Then } = createBdd<BddContext>();
 
 Given('I am on the login page', async ({ page }: BddContext) => {
-    await page.goto('https://the-internet.herokuapp.com/login');
+    // Use relative URL since baseURL is configured in playwright.config.ts
+    await page.goto('/login');
 });
 
 When('I enter valid credentials', async ({ page }: BddContext) => {
-    await page.locator('#username').fill('tomsmith');
-    await page.locator('#password').fill('SuperSecretPassword!');
+    await page.locator('#username').fill(process.env.TEST_USERNAME!);
+    await page.locator('#password').fill(process.env.TEST_PASSWORD!);
     await page.locator('button[type="submit"]').click();
 });
 

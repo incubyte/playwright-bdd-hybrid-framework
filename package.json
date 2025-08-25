@@ -3,13 +3,23 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx bddgen && npx playwright test",
+    "test:headed": "npx bddgen && npx playwright test --headed",
+    "test:ui": "npx bddgen && npx playwright test --ui",
+    "test:debug": "npx bddgen && npx playwright test --debug",
+    "test:chrome": "npx bddgen && npx playwright test --project=chromium",
+    "test:firefox": "npx bddgen && npx playwright test --project=firefox",
+    "test:safari": "npx bddgen && npx playwright test --project=webkit",
+    "test:all-browsers": "npx bddgen && npx playwright test --project=chromium --project=firefox --project=webkit",
+    "report": "npx playwright show-report"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0",
+    "dotenv": "^17.2.1",
     "playwright-bdd": "^8.4.0"
   }
 }
