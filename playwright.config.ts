@@ -6,15 +6,25 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Define the base URL directly in config
-const BASE_URL = 'https://the-internet.herokuapp.com';
+const BASE_URL = process.env.BASE_URL || 'https://the-internet.herokuapp.com';
+const API_BASE_URL = process.env.API_BASE_URL || 'https://the-internet.herokuapp.com';
+
+// Define test type - can be UI, API, or BOTH
+const TEST_TYPE = process.env.TEST_TYPE || 'UI';
 
 // Define default test credentials
 const TEST_USERNAME = process.env.TEST_USERNAME || 'tomsmith';
 const TEST_PASSWORD = process.env.TEST_PASSWORD || 'SuperSecretPassword!';
 
 // Make these values available through process.env to ensure they're available in step definitions
+process.env.BASE_URL = BASE_URL;
+process.env.API_BASE_URL = API_BASE_URL;
+process.env.TEST_TYPE = TEST_TYPE;
 process.env.TEST_USERNAME = TEST_USERNAME;
 process.env.TEST_PASSWORD = TEST_PASSWORD;
+
+// Log the test type being used
+console.log(`Running tests in ${TEST_TYPE} mode`);
 
 const testDir = defineBddConfig({
     features: 'features/**/*.feature',

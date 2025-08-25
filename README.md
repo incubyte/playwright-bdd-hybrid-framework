@@ -17,6 +17,13 @@ This framework combines the power of Playwright's modern browser automation capa
 │   │   ├── DashboardPage.ts  # Dashboard/secure area page interactions
 │   │   ├── LoginPage.ts      # Login page interactions
 │   │   └── PageFactory.ts    # Factory for managing page objects
+│   ├── services/             # API Services
+│   │   ├── api/              # API Clients
+│   │   │   ├── AuthApiClient.ts    # Authentication API methods
+│   │   │   ├── BaseApiClient.ts    # Base API client with HTTP methods
+│   │   │   └── ServiceFactory.ts   # Factory for managing API clients
+│   │   └── models/           # API Data Models
+│   │       └── ApiModels.ts  # Interface definitions for API requests/responses
 │   └── steps/                # Step definitions
 │       └── sampleSteps.ts    # Implementation of test steps
 ├── test-results/             # Test execution artifacts
@@ -92,46 +99,70 @@ npm run test:safari
 
 # Run tests in all browsers
 npm run test:all-browsers
+
+# Run API-only tests
+npm run test:api
+
+# Run UI-only tests
+npm run test:ui-only
+
+# Run both UI and API tests together
+npm run test:both
 ```
 
 ## 🌟 Key Features and Benefits
 
-### 1. Page Object Model Architecture
+### 1. Hybrid Testing Architecture (UI & API)
+
+- **Multi-layer Testing**: Framework supports both UI and API testing with the same BDD scenarios
+- **Flexible Execution Modes**: Tests can run in UI-only, API-only, or both modes
+- **Shared Scenarios**: Same BDD feature files drive both UI and API tests
+- **Comprehensive Coverage**: Validates application functionality at multiple levels
+
+### 2. API Testing Integration
+
+- **API Client Layer**: Structured API client classes for different service endpoints
+- **Base API Client**: Core HTTP methods (GET, POST, PUT, DELETE) with automatic initialization
+- **Service Factory Pattern**: Centralized management of API client instances
+- **Response Handling**: Standardized response parsing and error handling
+- **Resource Management**: Proper cleanup with dispose() method to release network resources
+
+### 3. Page Object Model Architecture
 
 - **Separation of Concerns**: Test logic is separated from page interactions
 - **Reusability**: Page objects can be reused across multiple test scenarios
 - **Maintainability**: UI changes require updates in only one place
 - **Readability**: Tests express intent rather than implementation details
 
-### 2. BDD Approach
+### 4. BDD Approach
 
 - **Collaboration**: Features written in business language that all team members understand
 - **Living Documentation**: Features serve as both specifications and tests
 - **Scenario-Driven**: Tests focus on user scenarios rather than implementation details
 - **Early Validation**: Features can be reviewed before implementation begins
 
-### 3. PageFactory Pattern
+### 5. PageFactory Pattern
 
 - **Efficient Resource Management**: Page objects are created once and reused
 - **Reduced Duplication**: Centralized creation of page objects
 - **Performance Optimization**: Lazy initialization of page objects
 - **Consistent State**: All step definitions access the same page instances
 
-### 4. Base Page Inheritance
+### 6. Base Page Inheritance
 
 - **Code Reuse**: Common functionality defined once in BasePage
 - **Consistency**: Standard behaviors implemented the same way across pages
 - **DRY Principle**: Avoids duplication of common methods
 - **Focused Page Objects**: Page classes focus only on their unique functionality
 
-### 5. Multi-Browser Support
+### 7. Multi-Browser Support
 
 - **Cross-Browser Validation**: Tests can run on Chrome, Firefox, and Safari
 - **Parallel Execution**: Tests can run simultaneously in different browsers
 - **Flexible Configuration**: Easy switching between headed and headless modes
 - **Targeted Testing**: Ability to test in specific browsers as needed
 
-### 6. Reporting and Debugging
+### 8. Reporting and Debugging
 
 - **HTML Reports**: Comprehensive test reports with screenshots and traces
 - **UI Mode**: Interactive mode for debugging tests
@@ -142,7 +173,6 @@ npm run test:all-browsers
 
 The framework can be easily extended with:
 
-- API testing capabilities
 - Visual regression testing
 - Performance testing
 - Accessibility testing
