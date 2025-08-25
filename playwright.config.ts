@@ -12,6 +12,9 @@ const API_BASE_URL = process.env.API_BASE_URL || 'https://the-internet.herokuapp
 // Define test type - can be UI, API, or BOTH
 const TEST_TYPE = process.env.TEST_TYPE || 'UI';
 
+// Define logging level - defaults to info if not specified
+const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+
 // Define default test credentials
 const TEST_USERNAME = process.env.TEST_USERNAME || 'tomsmith';
 const TEST_PASSWORD = process.env.TEST_PASSWORD || 'SuperSecretPassword!';
@@ -22,9 +25,10 @@ process.env.API_BASE_URL = API_BASE_URL;
 process.env.TEST_TYPE = TEST_TYPE;
 process.env.TEST_USERNAME = TEST_USERNAME;
 process.env.TEST_PASSWORD = TEST_PASSWORD;
+process.env.LOG_LEVEL = LOG_LEVEL;
 
-// Log the test type being used
-console.log(`Running tests in ${TEST_TYPE} mode`);
+// Log the test type and logging level being used
+console.log(`Running tests in ${TEST_TYPE} mode with logging level: ${LOG_LEVEL}`);
 
 const testDir = defineBddConfig({
     features: 'features/**/*.feature',

@@ -6,7 +6,7 @@
     "test": "npx bddgen && npx playwright test",
     "test:headed": "npx bddgen && npx playwright test --headed",
     "test:ui": "npx bddgen && npx playwright test --ui",
-    "test:debug": "npx bddgen && npx playwright test --debug",
+    "test:debug": "cross-env LOG_LEVEL=debug npx bddgen && cross-env LOG_LEVEL=debug npx playwright test --debug",
     "test:chrome": "npx bddgen && npx playwright test --project=chromium",
     "test:firefox": "npx bddgen && npx playwright test --project=firefox",
     "test:safari": "npx bddgen && npx playwright test --project=webkit",

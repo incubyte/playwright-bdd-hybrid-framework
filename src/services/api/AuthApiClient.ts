@@ -1,6 +1,7 @@
 import { APIResponse } from '@playwright/test';
 import { BaseApiClient } from './BaseApiClient';
 import { LoginResponse } from '../models/ApiModels';
+import { log } from '../../utils/logger';
 
 export class AuthApiClient extends BaseApiClient {
 
@@ -8,6 +9,7 @@ export class AuthApiClient extends BaseApiClient {
         const username = process.env.TEST_USERNAME || 'tomsmith';
         const password = process.env.TEST_PASSWORD || 'SuperSecretPassword!';
 
+        log.info(`Attempting login with username: ${username}`);
         return await this.post('/authenticate', {
             form: {
                 username,
@@ -21,6 +23,9 @@ export class AuthApiClient extends BaseApiClient {
             if (response.ok()) {
                 try {
                     const json = await response.json();
+                    log.info('Login successful, JSON response received');
+                    log.debug('Login response data', json);
+
                     return {
                         authenticated: true,
                         message: 'Login successful',
@@ -29,6 +34,9 @@ export class AuthApiClient extends BaseApiClient {
                     };
                 } catch (e) {
                     const text = await response.text();
+                    log.warn('Login successful, but could not parse JSON response', e);
+                    log.debug('Raw response text:', text);
+
                     return {
                         authenticated: true,
                         message: 'Login successful',
@@ -36,12 +44,14 @@ export class AuthApiClient extends BaseApiClient {
                     };
                 }
             } else {
+                log.warn(`Login failed with status ${response.status()}`);
                 return {
                     authenticated: false,
                     message: `Login failed with status ${response.status()}`
                 };
             }
         } catch (error) {
+            log.error('Error processing login response', error);
             return {
                 authenticated: false,
                 message: `Error processing login response: ${error}`

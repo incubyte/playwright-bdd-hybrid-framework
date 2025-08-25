@@ -6,81 +6,34 @@ A robust end-to-end testing framework built with Playwright and Cucumber BDD, de
 
 This framework combines the power of Playwright's modern browser automation capabilities with Cucumber's Behavior-Driven Development approach, enabling both technical and non-technical team members to collaborate effectively on test automation.
 
-## 🏗️ Repository Structure
+## 🌟 Key Features
 
-```
-├── features/                 # Cucumber feature files
-│   └── login.feature         # Login functionality scenarios
-├── src/                      # Source code
-│   ├── pages/                # Page Object Model classes
-│   │   ├── BasePage.ts       # Base page with common utilities
-│   │   ├── DashboardPage.ts  # Dashboard/secure area page interactions
-│   │   ├── LoginPage.ts      # Login page interactions
-│   │   └── PageFactory.ts    # Factory for managing page objects
-│   ├── services/             # API Services
-│   │   ├── api/              # API Clients
-│   │   │   ├── AuthApiClient.ts    # Authentication API methods
-│   │   │   ├── BaseApiClient.ts    # Base API client with HTTP methods
-│   │   │   └── ServiceFactory.ts   # Factory for managing API clients
-│   │   └── models/           # API Data Models
-│   │       └── ApiModels.ts  # Interface definitions for API requests/responses
-│   └── steps/                # Step definitions
-│       └── sampleSteps.ts    # Implementation of test steps
-├── test-results/             # Test execution artifacts
-├── playwright-report/        # HTML test reports
-├── package.json              # Project dependencies and scripts
-├── playwright.config.ts      # Playwright configuration
-└── tsconfig.json             # TypeScript configuration
-```
+- **Hybrid Testing**: Combined UI and API testing in a single framework
+- **BDD Approach**: Uses Cucumber for behavior-driven development
+- **Page Object Model**: Clean separation of test logic and UI interactions
+- **Factory Patterns**: Efficient resource management for both UI and API components
+- **Multi-Browser Support**: Tests run on Chrome, Firefox, and Safari
+- **Structured Logging**: Configurable logging levels with detailed insights
+- **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
 
-## 🔑 Key Components
+## 🚀 Getting Started
 
-### Feature Files (`features/`)
+### Prerequisites
 
-BDD feature files written in Gherkin syntax, describing application behavior from a user's perspective:
+- Node.js (v14 or higher)
+- npm (v6 or higher)
 
-```gherkin
-Feature: Sample Login
-  Scenario: Successful Login
-    Given I am on the login page
-    When I enter valid credentials
-    Then I should be redirected to the dashboard
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/playwright-bdd-hybrid-framework.git
+
+# Install dependencies
+npm install
 ```
 
-### Page Objects (`src/pages/`)
-
-- **BasePage.ts**: Abstract base class with common utilities for all pages:
-  - Page loading utilities
-  - URL and title verification
-  - Screenshot capture
-  - Element text verification
-
-- **LoginPage.ts & DashboardPage.ts**: Page-specific classes that extend BasePage:
-  - Page element locators
-  - Page-specific interactions
-  - State verification methods
-
-- **PageFactory.ts**: Implements the Singleton pattern for efficient page object management:
-  - Centralized page object creation
-  - Page object caching and reuse
-  - Lazy initialization
-
-### Step Definitions (`src/steps/`)
-
-Step definition files that implement the Gherkin steps from feature files:
-- Connect feature file steps to actual page interactions
-- Use PageFactory to efficiently manage page objects
-- Implement assertions to verify expected behavior
-
-### Configuration Files
-
-- **playwright.config.ts**: Configures Playwright settings and browser projects
-- **tsconfig.json**: TypeScript compiler options
-- **package.json**: Project dependencies and NPM scripts
-
-## 🚀 Running Tests
-
-The framework supports multiple ways to run tests:
+### Running Tests
 
 ```bash
 # Run all tests in headless mode
@@ -91,6 +44,9 @@ npm run test:headed
 
 # Run tests in UI mode for interactive debugging
 npm run test:ui
+
+# Run tests in debug mode with detailed logging
+npm run test:debug
 
 # Run tests in specific browsers
 npm run test:chrome
@@ -108,76 +64,183 @@ npm run test:ui-only
 
 # Run both UI and API tests together
 npm run test:both
+
+# Run tests with custom log level
+LOG_LEVEL=debug npm run test:api
+LOG_LEVEL=warn npm run test:chrome
 ```
 
-## 🌟 Key Features and Benefits
+## 🏗️ Architecture Overview
 
-### 1. Hybrid Testing Architecture (UI & API)
+The framework is built with a layered architecture that separates concerns and promotes reusability:
 
-- **Multi-layer Testing**: Framework supports both UI and API testing with the same BDD scenarios
-- **Flexible Execution Modes**: Tests can run in UI-only, API-only, or both modes
-- **Shared Scenarios**: Same BDD feature files drive both UI and API tests
-- **Comprehensive Coverage**: Validates application functionality at multiple levels
+### 1. BDD Layer (Gherkin Features)
 
-### 2. API Testing Integration
+Feature files written in Gherkin syntax describe application behavior from a user's perspective.
 
-- **API Client Layer**: Structured API client classes for different service endpoints
-- **Base API Client**: Core HTTP methods (GET, POST, PUT, DELETE) with automatic initialization
-- **Service Factory Pattern**: Centralized management of API client instances
-- **Response Handling**: Standardized response parsing and error handling
-- **Resource Management**: Proper cleanup with dispose() method to release network resources
+```gherkin
+Feature: Sample Login
+  Scenario: Successful Login
+    Given I am on the login page
+    When I enter valid credentials
+    Then I should be redirected to the dashboard
+```
 
-### 3. Page Object Model Architecture
+### 2. Step Definitions Layer
 
-- **Separation of Concerns**: Test logic is separated from page interactions
-- **Reusability**: Page objects can be reused across multiple test scenarios
-- **Maintainability**: UI changes require updates in only one place
-- **Readability**: Tests express intent rather than implementation details
+Step definition files connect Gherkin steps to actual implementations using:
+- Page objects for UI interactions
+- API clients for backend calls
+- Custom assertions for verification
 
-### 4. BDD Approach
+### 3. UI Testing Layer (Page Objects)
 
-- **Collaboration**: Features written in business language that all team members understand
-- **Living Documentation**: Features serve as both specifications and tests
-- **Scenario-Driven**: Tests focus on user scenarios rather than implementation details
-- **Early Validation**: Features can be reviewed before implementation begins
+Page objects provide a clean abstraction over UI elements and interactions:
+- **BasePage**: Common utilities and methods
+- **Specialized Pages**: Specific page interactions
+- **PageFactory**: Efficient page object management
 
-### 5. PageFactory Pattern
+### 4. API Testing Layer (Service Clients)
 
-- **Efficient Resource Management**: Page objects are created once and reused
-- **Reduced Duplication**: Centralized creation of page objects
-- **Performance Optimization**: Lazy initialization of page objects
-- **Consistent State**: All step definitions access the same page instances
+API clients handle backend service calls:
+- **BaseApiClient**: Core HTTP functionality
+- **Specialized Clients**: Domain-specific API operations
+- **ServiceFactory**: Centralized client management
 
-### 6. Base Page Inheritance
+### 5. Utilities Layer
 
-- **Code Reuse**: Common functionality defined once in BasePage
-- **Consistency**: Standard behaviors implemented the same way across pages
-- **DRY Principle**: Avoids duplication of common methods
-- **Focused Page Objects**: Page classes focus only on their unique functionality
+Cross-cutting concerns that support the entire framework:
+- **Logger**: Structured logging system
+- **Configuration**: Environment-based configuration
 
-### 7. Multi-Browser Support
+## 📁 Repository Structure
 
-- **Cross-Browser Validation**: Tests can run on Chrome, Firefox, and Safari
-- **Parallel Execution**: Tests can run simultaneously in different browsers
-- **Flexible Configuration**: Easy switching between headed and headless modes
-- **Targeted Testing**: Ability to test in specific browsers as needed
+```
+├── features/                 # Cucumber feature files
+│   └── login.feature         # Login functionality scenarios
+├── src/                      # Source code
+│   ├── pages/                # Page Object Model classes
+│   │   ├── BasePage.ts       # Base page with common utilities
+│   │   ├── DashboardPage.ts  # Dashboard/secure area page interactions
+│   │   ├── LoginPage.ts      # Login page interactions
+│   │   └── PageFactory.ts    # Factory for managing page objects
+│   ├── services/             # API Services
+│   │   ├── api/              # API Clients
+│   │   │   ├── AuthApiClient.ts    # Authentication API methods
+│   │   │   ├── BaseApiClient.ts    # Base API client with HTTP methods
+│   │   │   └── ServiceFactory.ts   # Factory for managing API clients
+│   │   └── models/           # API Data Models
+│   │       └── ApiModels.ts  # Interface definitions for API requests/responses
+│   ├── utils/                # Utilities and Helpers
+│   │   └── logger.ts         # Configurable logging utility
+│   └── steps/                # Step definitions
+│       └── sampleSteps.ts    # Implementation of test steps
+├── test-results/             # Test execution artifacts
+├── playwright-report/        # HTML test reports
+├── package.json              # Project dependencies and scripts
+├── playwright.config.ts      # Playwright configuration
+└── tsconfig.json             # TypeScript configuration
+```
 
-### 8. Reporting and Debugging
+## 🧩 Component Details
 
-- **HTML Reports**: Comprehensive test reports with screenshots and traces
-- **UI Mode**: Interactive mode for debugging tests
-- **Video Recording**: Optional recording of test executions
-- **Failure Screenshots**: Automatic capture of screenshots on test failures
+### UI Layer: Page Objects
 
-## 🔧 Framework Extensions
+The Page Object Model architecture separates UI interactions from test logic:
 
-The framework can be easily extended with:
+#### BasePage
 
-- Visual regression testing
-- Performance testing
-- Accessibility testing
-- Data-driven testing
-- CI/CD integration
+Abstract base class with common utilities for all pages:
+```typescript
+// Page loading utilities
+async waitForPageLoad() {
+    log.debug('Waiting for page to reach networkidle state');
+    await this.page.waitForLoadState('networkidle');
+    log.debug('Page load completed');
+}
+
+// Verification methods
+async verifyPageTitle(title: string) {
+    log.debug(`Verifying page title matches "${title}"`);
+    await expect(this.page).toHaveTitle(new RegExp(title));
+    log.debug('Page title verified successfully');
+}
+```
+
+#### PageFactory
+
+Manages page object creation and lifecycle:
+```typescript
+public getLoginPage(): LoginPage {
+    if (!this.pageInstances.has('loginPage')) {
+        log.debug('Creating new LoginPage instance');
+        this.pageInstances.set('loginPage', new LoginPage(this.page));
+    } else {
+        log.debug('Returning cached LoginPage instance');
+    }
+    return this.pageInstances.get('loginPage');
+}
+```
+
+### API Layer: Service Clients
+
+The API testing architecture provides a clean, modular approach to service interaction:
+
+#### BaseApiClient
+
+Foundation class for all API operations:
+```typescript
+async post(url: string, options?: any): Promise<APIResponse> {
+    if (!this.apiContext) {
+        log.debug('API context not initialized for POST request, initializing now');
+        await this.init();
+    }
+    log.debug(`POST request to ${url}`, options);
+    const response = await this.apiContext.post(url, options);
+    log.debug(`POST response from ${url}: status ${response.status()}`);
+    return response;
+}
+```
+
+#### ServiceFactory
+
+Manages API client instances:
+```typescript
+public async getAuthApiClient(): Promise<AuthApiClient> {
+    if (!this.serviceInstances.has('authApiClient')) {
+        log.debug('Creating new AuthApiClient instance');
+        const client = new AuthApiClient();
+        await client.init();
+        this.serviceInstances.set('authApiClient', client);
+        log.info('AuthApiClient instance created and initialized');
+    }
+    return this.serviceInstances.get('authApiClient');
+}
+```
+
+### Logging System
+
+The framework includes a robust logging system for detailed test execution insights:
+
+#### Log Levels
+
+```typescript
+export enum LogLevel {
+  DEBUG = 1,    // Most verbose - detailed debug information
+  INFO = 2,     // General information about test progress
+  WARN = 3,     // Warnings that don't fail tests but require attention
+  ERROR = 4,    // Error conditions that affect test execution
+  NONE = 5      // No logging
+}
+```
+
+#### Configuration Options
+
+The logging level can be configured in multiple ways:
+1. **Environment Variable**: Set `LOG_LEVEL` in your environment
+2. **Command Line**: Override for specific runs (`LOG_LEVEL=debug npm run test:api`)
+3. **.env File**: Default setting in your project's `.env` file
+4. **Configuration**: Handled in `playwright.config.ts` with fallback to 'info'
 
 ## 📊 Best Practices
 
@@ -197,3 +260,12 @@ This framework is designed to work seamlessly with CI/CD pipelines, supporting:
 - Azure DevOps
 - CircleCI
 - Travis CI
+
+## 🔧 Framework Extensions
+
+The framework can be easily extended with:
+
+- Visual regression testing
+- Performance testing
+- Accessibility testing
+- Data-driven testing
