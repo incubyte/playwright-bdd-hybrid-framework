@@ -10,3 +10,4 @@ playwright-report/
 allure-results/
 allure-report/
 .idea/
+.features-gen/
