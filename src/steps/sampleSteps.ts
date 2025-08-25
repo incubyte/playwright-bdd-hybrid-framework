@@ -1,8 +1,7 @@
 import { expect, Page } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import dotenv from 'dotenv';
-import { LoginPage } from '../pages/LoginPage';
-import { DashboardPage } from '../pages/DashboardPage';
+import { PageFactory } from '../pages/PageFactory';
 
 // Load environment variables
 dotenv.config();
@@ -14,19 +13,30 @@ interface BddContext {
 
 const { Given, When, Then } = createBdd<BddContext>();
 
+// Store pageFactory to avoid recreating it
+let pageFactory: PageFactory;
+
 Given('I am on the login page', async ({ page }: BddContext) => {
-    const loginPage = new LoginPage(page);
+    // Initialize pageFactory if it doesn't exist yet
+    pageFactory = pageFactory || PageFactory.getInstance(page);
+    const loginPage = pageFactory.getLoginPage();
+
     await loginPage.goto();
     await loginPage.isPageLoaded();
 });
 
 When('I enter valid credentials', async ({ page }: BddContext) => {
-    const loginPage = new LoginPage(page);
+    // Use the same pageFactory instance
+    pageFactory = pageFactory || PageFactory.getInstance(page);
+    const loginPage = pageFactory.getLoginPage();
+
     await loginPage.login(process.env.TEST_USERNAME!, process.env.TEST_PASSWORD!);
 });
 
 Then('I should be redirected to the dashboard', async ({ page }: BddContext) => {
-    const dashboardPage = new DashboardPage(page);
+    // Use the same pageFactory instance
+    pageFactory = pageFactory || PageFactory.getInstance(page);
+    const dashboardPage = pageFactory.getDashboardPage();
 
     // Verify we're on the secure page
     await expect(page).toHaveURL(/\/secure$/);
