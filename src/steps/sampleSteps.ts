@@ -1,6 +1,8 @@
 import { expect, Page } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import dotenv from 'dotenv';
+import { LoginPage } from '../pages/LoginPage';
+import { DashboardPage } from '../pages/DashboardPage';
 
 // Load environment variables
 dotenv.config();
@@ -13,22 +15,28 @@ interface BddContext {
 const { Given, When, Then } = createBdd<BddContext>();
 
 Given('I am on the login page', async ({ page }: BddContext) => {
-    // Use relative URL since baseURL is configured in playwright.config.ts
-    await page.goto('/login');
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.isPageLoaded();
 });
 
 When('I enter valid credentials', async ({ page }: BddContext) => {
-    await page.locator('#username').fill(process.env.TEST_USERNAME!);
-    await page.locator('#password').fill(process.env.TEST_PASSWORD!);
-    await page.locator('button[type="submit"]').click();
+    const loginPage = new LoginPage(page);
+    await loginPage.login(process.env.TEST_USERNAME!, process.env.TEST_PASSWORD!);
 });
 
 Then('I should be redirected to the dashboard', async ({ page }: BddContext) => {
+    const dashboardPage = new DashboardPage(page);
+
+    // Verify we're on the secure page
     await expect(page).toHaveURL(/\/secure$/);
+    await dashboardPage.isPageLoaded();
 
-    const flashMessage = page.locator('#flash.success');
-    await expect(flashMessage).toBeVisible();
-    await expect(flashMessage).toContainText('You logged into a secure area!');
+    // Verify success message
+    await expect(dashboardPage.successMessage).toBeVisible();
+    const message = await dashboardPage.getSuccessMessage();
+    await expect(message).toContain('You logged into a secure area!');
 
-    await expect(page.locator('a.button')).toContainText('Logout');
+    // Verify logout button
+    await expect(dashboardPage.logoutButton).toContainText('Logout');
 });
