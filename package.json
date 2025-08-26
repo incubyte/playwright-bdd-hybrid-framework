@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx bddgen && npx playwright test",
+    "test": "npx bddgen && npx playwright test ",
     "test:headed": "npx bddgen && npx playwright test --headed",
     "test:ui": "npx bddgen && npx playwright test --ui",
     "test:debug": "cross-env LOG_LEVEL=debug npx bddgen && cross-env LOG_LEVEL=debug npx playwright test --debug",

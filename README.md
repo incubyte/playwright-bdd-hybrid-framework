@@ -13,6 +13,7 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Page Object Model**: Clean separation of test logic and UI interactions
 - **Factory Patterns**: Efficient resource management for both UI and API components
 - **Multi-Browser Support**: Tests run on Chrome, Firefox, and Safari
+- **Test Hooks**: Flexible before/after hooks for setup and teardown operations
 - **Structured Logging**: Configurable logging levels with detailed insights
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
 - **Allure Reporting**: Enhanced reporting with detailed visualizations and analytics
@@ -131,6 +132,7 @@ Cross-cutting concerns that support the entire framework:
 │   │   └── models/           # API Data Models
 │   │       └── ApiModels.ts  # Interface definitions for API requests/responses
 │   ├── utils/                # Utilities and Helpers
+│   │   ├── hooks.ts          # Test lifecycle hooks for setup/teardown
 │   │   └── logger.ts         # Configurable logging utility
 │   └── steps/                # Step definitions
 │       └── sampleSteps.ts    # Implementation of test steps
@@ -321,3 +323,41 @@ The framework can be easily extended with:
 - Performance testing
 - Accessibility testing
 - Data-driven testing
+
+## 🪝 Hooks System
+
+The framework includes a powerful test hooks implementation for flexible test lifecycle management:
+
+#### Test Lifecycle Hooks
+
+```typescript
+// Hooks for test setup and teardown
+beforeFeature(async (feature) => {
+    log.info(`Starting feature: ${feature.name}`);
+    // Setup operations before each feature
+});
+
+afterFeature(async (feature) => {
+    log.info(`Completed feature: ${feature.name}`);
+    // Cleanup operations after each feature
+});
+
+beforeScenario(async (scenario) => {
+    log.info(`Starting scenario: ${scenario.name}`);
+    // Setup operations before each scenario
+});
+
+afterScenario(async (scenario) => {
+    log.info(`Completed scenario: ${scenario.name} with status: ${scenario.result}`);
+    // Cleanup operations after each scenario, handle different outcomes
+});
+```
+
+#### Benefits of Hooks Implementation
+
+- **Cleaner Test Code**: Move setup/teardown logic out of test steps
+- **Improved Test Isolation**: Ensure each test starts with a clean state
+- **Resource Management**: Properly initialize and clean up resources
+- **Conditional Logic**: Apply different setup based on test tags or metadata
+- **Environment Handling**: Prepare different environments for UI vs API tests
+- **Failure Recovery**: Implement cleanup even when tests fail
