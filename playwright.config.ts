@@ -37,12 +37,22 @@ const testDir = defineBddConfig({
 
 export default defineConfig({
     testDir,
-    reporter: 'html',
+    // Configure multiple reporters: HTML and Allure
+    reporter: [
+        ['html'],
+        ['allure-playwright', {
+            detail: true,
+            outputFolder: 'allure-results',
+            suiteTitle: false
+        }]
+    ],
     use: {
         // Set base URL for all tests
         baseURL: BASE_URL,
         // Set screenshot option
         screenshot: process.env.SCREENSHOT_ON_FAILURE === 'true' ? 'only-on-failure' : 'off',
+        // Enable trace for Allure reporting
+        trace: 'retain-on-failure',
     },
     // Set timeout from env variable or default to 30 seconds
     timeout: parseInt(process.env.DEFAULT_TIMEOUT || '30000'),

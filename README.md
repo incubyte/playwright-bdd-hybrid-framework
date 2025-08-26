@@ -15,6 +15,7 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Multi-Browser Support**: Tests run on Chrome, Firefox, and Safari
 - **Structured Logging**: Configurable logging levels with detailed insights
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
+- **Allure Reporting**: Enhanced reporting with detailed visualizations and analytics
 
 ## 🚀 Getting Started
 
@@ -242,14 +243,43 @@ The logging level can be configured in multiple ways:
 3. **.env File**: Default setting in your project's `.env` file
 4. **Configuration**: Handled in `playwright.config.ts` with fallback to 'info'
 
-## 📊 Best Practices
+## 📊 Reporting
 
-- Maintain one feature file per major functionality
-- Keep step definitions focused and reusable
-- Follow the Page Object Model pattern for all UI interactions
-- Use the PageFactory for efficient page object management
-- Store test data in separate files or environment variables
-- Add descriptive assertions for better failure messages
+### HTML Reports
+
+The framework includes built-in HTML reporting for test results:
+
+```bash
+# Generate and view HTML report
+npm run report
+```
+
+### Allure Reports
+
+Allure provides enhanced reporting capabilities with rich visualizations:
+
+```bash
+# Generate Allure report from test results
+npm run allure:generate
+
+# Open Allure report in browser
+npm run allure:open
+
+# Generate and open Allure report (combined command)
+npm run allure:report
+```
+
+#### Allure Report Features
+
+The Allure reporting system offers several advantages:
+
+- **Interactive Dashboard**: Overview of test execution with pass/fail statistics
+- **Detailed Test Cases**: Step-by-step test execution with screenshots and traces
+- **Timeline View**: Chronological representation of test execution
+- **Categorized Failures**: Group failures by type for easier troubleshooting
+- **Environment Details**: Capture test environment information
+- **Attachments**: View screenshots, videos, and logs directly in the report
+- **BDD Integration**: Cucumber steps are properly displayed in the report hierarchy
 
 ## 🔄 Continuous Integration
 
