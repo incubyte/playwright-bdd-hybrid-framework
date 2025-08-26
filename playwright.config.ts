@@ -9,7 +9,7 @@ dotenv.config();
 const BASE_URL = process.env.BASE_URL || 'https://the-internet.herokuapp.com';
 const API_BASE_URL = process.env.API_BASE_URL || 'https://the-internet.herokuapp.com';
 
-// Define test type - can be UI, API, or BOTH
+// Define test type - can be UI or API
 const TEST_TYPE = process.env.TEST_TYPE || 'UI';
 
 // Define logging level - defaults to info if not specified
@@ -57,25 +57,52 @@ export default defineConfig({
     // Set timeout from env variable or default to 30 seconds
     timeout: parseInt(process.env.DEFAULT_TIMEOUT || '30000'),
 
-    // Define browser projects
+    // Define projects with UI and API categories for better Allure reporting
     projects: [
+        // UI Category - Contains all browser tests
         {
-            name: 'chromium',
+            name: 'ui-chromium',
+            testMatch: /.*\.feature/,
             use: {
                 browserName: 'chromium',
             },
+            metadata: {
+                type: 'UI'
+            }
         },
         {
-            name: 'firefox',
+            name: 'ui-firefox',
+            testMatch: /.*\.feature/,
             use: {
                 browserName: 'firefox',
             },
+            metadata: {
+                type: 'UI'
+            }
         },
         {
-            name: 'webkit',
+            name: 'ui-webkit',
+            testMatch: /.*\.feature/,
             use: {
                 browserName: 'webkit',
             },
+            metadata: {
+                type: 'UI'
+            }
         },
+
+        // API Category - No browser needed
+        {
+            name: 'api',
+            testMatch: /.*\.feature/,
+            use: {
+                // Use a browser-less context for API tests
+                browserName: 'chromium',
+                headless: true
+            },
+            metadata: {
+                type: 'API'
+            }
+        }
     ],
 });

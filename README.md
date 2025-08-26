@@ -16,6 +16,7 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Structured Logging**: Configurable logging levels with detailed insights
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
 - **Allure Reporting**: Enhanced reporting with detailed visualizations and analytics
+- **Test Organization**: Clear separation between UI and API tests
 
 ## 🚀 Getting Started
 
@@ -49,26 +50,23 @@ npm run test:ui
 # Run tests in debug mode with detailed logging
 npm run test:debug
 
-# Run tests in specific browsers
-npm run test:chrome
-npm run test:firefox
-npm run test:safari
+# Run UI tests in specific browsers
+npm run test:ui-chrome
+npm run test:ui-firefox
+npm run test:ui-safari
 
-# Run tests in all browsers
-npm run test:all-browsers
+# Run UI tests in all browsers
+npm run test:ui-all
 
 # Run API-only tests
 npm run test:api
 
-# Run UI-only tests
-npm run test:ui-only
-
-# Run both UI and API tests together
-npm run test:both
+# Clean Allure results and run tests with fresh reporting
+npm run test:clean-run
 
 # Run tests with custom log level
 LOG_LEVEL=debug npm run test:api
-LOG_LEVEL=warn npm run test:chrome
+LOG_LEVEL=warn npm run test:ui-chrome
 ```
 
 ## 🏗️ Architecture Overview
@@ -138,6 +136,8 @@ Cross-cutting concerns that support the entire framework:
 │       └── sampleSteps.ts    # Implementation of test steps
 ├── test-results/             # Test execution artifacts
 ├── playwright-report/        # HTML test reports
+├── allure-results/           # Allure test results data
+├── allure-report/            # Generated Allure reports
 ├── package.json              # Project dependencies and scripts
 ├── playwright.config.ts      # Playwright configuration
 └── tsconfig.json             # TypeScript configuration
@@ -259,6 +259,9 @@ npm run report
 Allure provides enhanced reporting capabilities with rich visualizations:
 
 ```bash
+# Clean previous Allure results
+npm run allure:clean
+
 # Generate Allure report from test results
 npm run allure:generate
 
@@ -267,6 +270,9 @@ npm run allure:open
 
 # Generate and open Allure report (combined command)
 npm run allure:report
+
+# Clean results, run tests, and generate report in one command
+npm run test:clean-run
 ```
 
 #### Allure Report Features
@@ -276,10 +282,26 @@ The Allure reporting system offers several advantages:
 - **Interactive Dashboard**: Overview of test execution with pass/fail statistics
 - **Detailed Test Cases**: Step-by-step test execution with screenshots and traces
 - **Timeline View**: Chronological representation of test execution
+- **Categorized Tests**: Tests organized by UI and API categories
 - **Categorized Failures**: Group failures by type for easier troubleshooting
 - **Environment Details**: Capture test environment information
 - **Attachments**: View screenshots, videos, and logs directly in the report
 - **BDD Integration**: Cucumber steps are properly displayed in the report hierarchy
+
+## 🔑 Key Implementation Details
+
+### Test Categorization
+
+The framework uses a simplified binary approach to test categorization:
+
+- **UI Tests**: Execute browser-based interactions
+- **API Tests**: Execute HTTP requests without browser UI
+
+This categorization is controlled by the `TEST_TYPE` environment variable, which can be:
+- `UI`: For browser-based tests
+- `API`: For API-only tests
+
+The project configuration in `playwright.config.ts` defines separate projects for UI tests with different browsers and API tests, making it easy to run them separately or together.
 
 ## 🔄 Continuous Integration
 

@@ -26,7 +26,7 @@ Given('I am on the login page', async ({ page }: BddContext) => {
     const testType = process.env.TEST_TYPE;
     log.debug(`Test type: ${testType}`);
 
-    if (testType === 'UI' || testType === 'BOTH') {
+    if (testType === 'UI') {
         log.info('Executing UI test: navigating to login page');
         pageFactory = pageFactory || PageFactory.getInstance(page);
         const loginPage = pageFactory.getLoginPage();
@@ -35,7 +35,7 @@ Given('I am on the login page', async ({ page }: BddContext) => {
         log.debug('Login page loaded successfully');
     }
 
-    if (testType === 'API' || testType === 'BOTH') {
+    if (testType === 'API') {
         log.info('Executing API test: preparing for login test');
         console.log('API Test: Preparing for API login test');
     }
@@ -47,7 +47,7 @@ When('I enter valid credentials', async ({ page }: BddContext) => {
     const password = process.env.TEST_PASSWORD!;
     log.debug(`Test type: ${testType}, Username: ${username}`);
 
-    if (testType === 'UI' || testType === 'BOTH') {
+    if (testType === 'UI') {
         log.info('Executing UI test: entering login credentials');
         pageFactory = pageFactory || PageFactory.getInstance(page);
         const loginPage = pageFactory.getLoginPage();
@@ -55,7 +55,7 @@ When('I enter valid credentials', async ({ page }: BddContext) => {
         log.debug('Credentials entered successfully');
     }
 
-    if (testType === 'API' || testType === 'BOTH') {
+    if (testType === 'API') {
         log.info('Executing API test: performing login request');
         try {
             const serviceFactory = ServiceFactory.getInstance();
@@ -100,7 +100,7 @@ Then('I should be redirected to the dashboard', async ({ page }: BddContext) => 
     const testType = process.env.TEST_TYPE;
     log.debug(`Test type: ${testType}`);
 
-    if (testType === 'UI' || testType === 'BOTH') {
+    if (testType === 'UI') {
         log.info('Executing UI test: verifying dashboard redirection');
         pageFactory = pageFactory || PageFactory.getInstance(page);
         const dashboardPage = pageFactory.getDashboardPage();
@@ -120,7 +120,7 @@ Then('I should be redirected to the dashboard', async ({ page }: BddContext) => 
         log.info('UI verification completed successfully');
     }
 
-    if (testType === 'API' || testType === 'BOTH') {
+    if (testType === 'API') {
         log.info('Executing API test: verifying login response');
         console.log('API Test: Verifying login response');
 
