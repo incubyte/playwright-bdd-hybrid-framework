@@ -4,7 +4,7 @@ import { DashboardPage } from './DashboardPage';
 import { log } from '../utils/logger';
 
 export class PageFactory {
-    private static instance: PageFactory;
+    private static instance: PageFactory | undefined;
     private pageInstances: Map<string, any> = new Map();
     private page: Page;
 
@@ -54,5 +54,17 @@ export class PageFactory {
             log.debug(`Returning cached instance for page type: ${key}`);
         }
         return this.pageInstances.get(key);
+    }
+
+    public dispose(): void {
+        try {
+            log.debug('Disposing PageFactory resources');
+            this.pageInstances.clear();
+            PageFactory.instance = undefined;
+            log.debug('PageFactory resources disposed successfully');
+        } catch (error) {
+            log.error('Error disposing PageFactory resources:', error);
+            throw error;
+        }
     }
 }

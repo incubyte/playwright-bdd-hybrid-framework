@@ -5,6 +5,8 @@ import { PageFactory } from '../pages/PageFactory';
 import { ServiceFactory } from '../services/api/ServiceFactory';
 import { LoginResponse } from '../services/models/ApiModels';
 import { log } from '../utils/logger';
+// Import hooks to ensure they're registered
+import '../utils/hooks';
 
 dotenv.config();
 

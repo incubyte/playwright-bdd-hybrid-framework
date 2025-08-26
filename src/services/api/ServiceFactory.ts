@@ -2,7 +2,7 @@ import { AuthApiClient } from './AuthApiClient';
 import { log } from '../../utils/logger';
 
 export class ServiceFactory {
-    private static instance: ServiceFactory;
+    private static instance: ServiceFactory | undefined;
     private serviceInstances: Map<string, any> = new Map();
 
     private constructor() {
@@ -29,5 +29,26 @@ export class ServiceFactory {
             log.debug('Returning existing AuthApiClient instance');
         }
         return this.serviceInstances.get('authApiClient');
+    }
+
+    public async dispose(): Promise<void> {
+        try {
+            log.debug('Disposing ServiceFactory resources');
+
+            for (const [key, client] of this.serviceInstances.entries()) {
+                log.debug(`Disposing client: ${key}`);
+                if (client && typeof client.close === 'function') {
+                    await client.close();
+                }
+            }
+
+            this.serviceInstances.clear();
+            ServiceFactory.instance = undefined;
+
+            log.debug('ServiceFactory resources disposed successfully');
+        } catch (error) {
+            log.error('Error disposing ServiceFactory resources:', error);
+            throw error;
+        }
     }
 }
