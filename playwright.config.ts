@@ -46,6 +46,8 @@ export default defineConfig({
             suiteTitle: false
         }]
     ],
+    // Enable fully parallel test execution
+    fullyParallel: true,
     use: {
         // Set base URL for all tests
         baseURL: BASE_URL,
