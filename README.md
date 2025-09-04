@@ -36,6 +36,31 @@ git clone https://github.com/your-org/playwright-bdd-hybrid-framework.git
 npm install
 ```
 
+### Environment Configuration
+
+Create a `.env` file in the root directory with the following structure:
+
+```dotenv
+# User Credentials for Test Authentication
+TEST_USERNAME=tomsmith
+TEST_PASSWORD=SuperSecretPassword!
+
+# Test Environment Configuration
+TEST_ENVIRONMENT=staging
+TEST_TYPE=UI
+
+# Logging Configuration
+LOG_LEVEL=debug
+
+# Execution Settings
+HEADLESS=false
+DEFAULT_TIMEOUT=30000
+
+# Reporting Settings
+SCREENSHOT_ON_FAILURE=true
+VIDEO_RECORDING=false
+```
+
 ### Running Tests
 
 ```bash
@@ -352,12 +377,3 @@ afterScenario(async (scenario) => {
     // Cleanup operations after each scenario, handle different outcomes
 });
 ```
-
-#### Benefits of Hooks Implementation
-
-- **Cleaner Test Code**: Move setup/teardown logic out of test steps
-- **Improved Test Isolation**: Ensure each test starts with a clean state
-- **Resource Management**: Properly initialize and clean up resources
-- **Conditional Logic**: Apply different setup based on test tags or metadata
-- **Environment Handling**: Prepare different environments for UI vs API tests
-- **Failure Recovery**: Implement cleanup even when tests fail
