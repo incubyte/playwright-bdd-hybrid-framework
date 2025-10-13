@@ -11,7 +11,8 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Hybrid Testing**: Combined UI and API testing in a single framework
 - **BDD Approach**: Uses Cucumber for behavior-driven development
 - **Page Object Model**: Clean separation of test logic and UI interactions
-- **Factory Patterns**: Efficient resource management for both UI and API components
+- **Direct Page Instantiation**: Simple and straightforward page object creation
+- **Service Factory Pattern**: Efficient resource management for API components
 - **Multi-Browser Support**: Tests run on Chrome, Firefox, and Safari
 - **Test Hooks**: Flexible before/after hooks for setup and teardown operations
 - **Structured Logging**: Configurable logging levels with detailed insights
@@ -87,6 +88,9 @@ npm run test:ui-all
 # Run API-only tests
 npm run test:api
 
+# Run UI and API tests in parallel
+npm run test:parallel
+
 # Clean Allure results and run tests with fresh reporting
 npm run test:clean-run
 
@@ -114,29 +118,41 @@ Feature: Sample Login
 ### 2. Step Definitions Layer
 
 Step definition files connect Gherkin steps to actual implementations using:
-- Page objects for UI interactions
-- API clients for backend calls
+- Direct page object instantiation for UI interactions
+- Service Factory for API client management
 - Custom assertions for verification
 
 ### 3. UI Testing Layer (Page Objects)
 
 Page objects provide a clean abstraction over UI elements and interactions:
-- **BasePage**: Common utilities and methods
-- **Specialized Pages**: Specific page interactions
-- **PageFactory**: Efficient page object management
+- **BasePage**: Common utilities and methods shared across all pages
+- **LoginPage**: Login page-specific interactions and locators
+- **DashboardPage**: Dashboard/secure area page interactions
+
+**Direct Instantiation Pattern:**
+```typescript
+// Pages are instantiated directly when needed
+const loginPage = new LoginPage(page);
+await loginPage.goto();
+await loginPage.login(username, password);
+
+const dashboardPage = new DashboardPage(page);
+await dashboardPage.isPageLoaded();
+```
 
 ### 4. API Testing Layer (Service Clients)
 
 API clients handle backend service calls:
-- **BaseApiClient**: Core HTTP functionality
-- **Specialized Clients**: Domain-specific API operations
-- **ServiceFactory**: Centralized client management
+- **BaseApiClient**: Core HTTP functionality (GET, POST, PUT, DELETE)
+- **AuthApiClient**: Authentication-specific API operations
+- **ServiceFactory**: Centralized client management with singleton pattern
 
 ### 5. Utilities Layer
 
 Cross-cutting concerns that support the entire framework:
-- **Logger**: Structured logging system
-- **Configuration**: Environment-based configuration
+- **Logger**: Structured logging system with configurable levels
+- **Hooks**: Test lifecycle management for setup and teardown
+- **Configuration**: Environment-based configuration management
 
 ## 📁 Repository Structure
 
@@ -146,13 +162,12 @@ Cross-cutting concerns that support the entire framework:
 ├── src/                      # Source code
 │   ├── pages/                # Page Object Model classes
 │   │   ├── BasePage.ts       # Base page with common utilities
-│   │   ├── DashboardPage.ts  # Dashboard/secure area page interactions
 │   │   ├── LoginPage.ts      # Login page interactions
-│   │   └── PageFactory.ts    # Factory for managing page objects
+│   │   └── DashboardPage.ts  # Dashboard/secure area page interactions
 │   ├── services/             # API Services
 │   │   ├── api/              # API Clients
-│   │   │   ├── AuthApiClient.ts    # Authentication API methods
 │   │   │   ├── BaseApiClient.ts    # Base API client with HTTP methods
+│   │   │   ├── AuthApiClient.ts    # Authentication API methods
 │   │   │   └── ServiceFactory.ts   # Factory for managing API clients
 │   │   └── models/           # API Data Models
 │   │       └── ApiModels.ts  # Interface definitions for API requests/responses
@@ -174,7 +189,7 @@ Cross-cutting concerns that support the entire framework:
 
 ### UI Layer: Page Objects
 
-The Page Object Model architecture separates UI interactions from test logic:
+The Page Object Model architecture separates UI interactions from test logic using direct instantiation:
 
 #### BasePage
 
@@ -195,19 +210,32 @@ async verifyPageTitle(title: string) {
 }
 ```
 
-#### PageFactory
+#### LoginPage & DashboardPage
 
-Manages page object creation and lifecycle:
+Specialized page classes that extend BasePage:
 ```typescript
-public getLoginPage(): LoginPage {
-    if (!this.pageInstances.has('loginPage')) {
-        log.debug('Creating new LoginPage instance');
-        this.pageInstances.set('loginPage', new LoginPage(this.page));
-    } else {
-        log.debug('Returning cached LoginPage instance');
+// LoginPage - handles login page interactions
+export class LoginPage extends BasePage {
+    readonly usernameInput: Locator;
+    readonly passwordInput: Locator;
+    readonly loginButton: Locator;
+    
+    async login(username: string, password: string) {
+        await this.usernameInput.fill(username);
+        await this.passwordInput.fill(password);
+        await this.loginButton.click();
     }
-    return this.pageInstances.get('loginPage');
 }
+```
+
+**Usage in Step Definitions:**
+```typescript
+// Direct instantiation - simple and clear
+Given('I am on the login page', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.isPageLoaded();
+});
 ```
 
 ### API Layer: Service Clients
@@ -220,7 +248,6 @@ Foundation class for all API operations:
 ```typescript
 async post(url: string, options?: any): Promise<APIResponse> {
     if (!this.apiContext) {
-        log.debug('API context not initialized for POST request, initializing now');
         await this.init();
     }
     log.debug(`POST request to ${url}`, options);
@@ -232,7 +259,7 @@ async post(url: string, options?: any): Promise<APIResponse> {
 
 #### ServiceFactory
 
-Manages API client instances:
+Manages API client instances with singleton pattern for efficient resource usage:
 ```typescript
 public async getAuthApiClient(): Promise<AuthApiClient> {
     if (!this.serviceInstances.has('authApiClient')) {
@@ -245,6 +272,39 @@ public async getAuthApiClient(): Promise<AuthApiClient> {
     return this.serviceInstances.get('authApiClient');
 }
 ```
+
+### Test Hooks
+
+The framework implements Before and After hooks for test lifecycle management:
+
+#### Before Hook
+Executes before each test scenario for setup operations:
+```typescript
+Before(async function ({ page }) {
+    log.debug('Executing Before hook');
+    // Add any setup logic here
+})
+```
+
+#### After Hook
+Executes after each test scenario for cleanup:
+```typescript
+After(async function ({ page }) {
+    log.debug('Executing After hook for cleanup');
+    
+    // Clean up Service objects (API clients)
+    const serviceFactory = ServiceFactory.getInstance();
+    await serviceFactory.dispose();
+    
+    log.debug('After hook completed');
+});
+```
+
+**Benefits of Hooks:**
+- Automatic resource cleanup after each test
+- Prevents memory leaks
+- Ensures test isolation
+- Consistent setup and teardown logic
 
 ### Logging System
 
@@ -270,6 +330,15 @@ The logging level can be configured in multiple ways:
 3. **.env File**: Default setting in your project's `.env` file
 4. **Configuration**: Handled in `playwright.config.ts` with fallback to 'info'
 
+#### Usage Example
+
+```typescript
+log.debug('Detailed debugging information');
+log.info('General information about test execution');
+log.warn('Warning message about potential issues');
+log.error('Error occurred during test execution', error);
+```
+
 ## 📊 Reporting
 
 ### HTML Reports
@@ -280,6 +349,13 @@ The framework includes built-in HTML reporting for test results:
 # Generate and view HTML report
 npm run report
 ```
+
+Features:
+- Test execution timeline
+- Pass/fail statistics
+- Screenshots on failure
+- Trace files for debugging
+- Detailed error messages
 
 ### Allure Reports
 
@@ -302,78 +378,164 @@ npm run allure:report
 npm run test:clean-run
 ```
 
-#### Allure Report Features
+**Allure Report Features:**
+- Test execution trends over time
+- Test categorization by severity and features
+- Detailed test case history
+- Behavior-driven test organization
+- Rich graphs and charts
+- Attachment support (screenshots, logs, videos)
 
-The Allure reporting system offers several advantages:
+## 🔄 Test Execution Flow
 
-- **Interactive Dashboard**: Overview of test execution with pass/fail statistics
-- **Detailed Test Cases**: Step-by-step test execution with screenshots and traces
-- **Timeline View**: Chronological representation of test execution
-- **Categorized Tests**: Tests organized by UI and API categories
-- **Categorized Failures**: Group failures by type for easier troubleshooting
-- **Environment Details**: Capture test environment information
-- **Attachments**: View screenshots, videos, and logs directly in the report
-- **BDD Integration**: Cucumber steps are properly displayed in the report hierarchy
+### UI Test Flow
 
-## 🔑 Key Implementation Details
+1. **Before Hook** - Executes setup operations
+2. **Test Scenario Starts** - BDD steps begin execution
+3. **Page Instantiation** - Pages created directly as needed
+   ```typescript
+   const loginPage = new LoginPage(page);
+   ```
+4. **Test Actions** - Interactions performed via page objects
+5. **Assertions** - Verifications using Playwright's expect
+6. **After Hook** - Cleanup of API service resources
+7. **Test Complete** - Results captured in reports
 
-### Test Categorization
+### API Test Flow
 
-The framework uses a simplified binary approach to test categorization:
+1. **Before Hook** - Executes setup operations
+2. **Test Scenario Starts** - BDD steps begin execution
+3. **Service Factory** - API client retrieved from factory
+   ```typescript
+   const serviceFactory = ServiceFactory.getInstance();
+   const authClient = await serviceFactory.getAuthApiClient();
+   ```
+4. **API Calls** - HTTP requests executed
+5. **Response Validation** - Status codes and data verified
+6. **After Hook** - Cleanup of API contexts
+7. **Test Complete** - Results captured in reports
 
-- **UI Tests**: Execute browser-based interactions
-- **API Tests**: Execute HTTP requests without browser UI
+## 🎯 Best Practices
 
-This categorization is controlled by the `TEST_TYPE` environment variable, which can be:
-- `UI`: For browser-based tests
-- `API`: For API-only tests
+### Page Objects
 
-The project configuration in `playwright.config.ts` defines separate projects for UI tests with different browsers and API tests, making it easy to run them separately or together.
+1. **Direct Instantiation**: Create page objects when needed, no factory overhead
+2. **Locator Strategy**: Use Playwright's built-in locator strategies
+3. **Reusability**: Common methods in BasePage
+4. **Single Responsibility**: Each page object handles one page
 
-## 🔄 Continuous Integration
+### API Testing
 
-This framework is designed to work seamlessly with CI/CD pipelines, supporting:
+1. **Factory Pattern**: Use ServiceFactory for API client management
+2. **Resource Cleanup**: Automatic disposal in After hooks
+3. **Error Handling**: Graceful error handling with logging
+4. **Response Validation**: Type-safe response models
 
-- GitHub Actions
-- Jenkins
-- Azure DevOps
-- CircleCI
-- Travis CI
+### Logging
 
-## 🔧 Framework Extensions
+1. **Appropriate Levels**: Use correct log level for each message
+2. **Contextual Information**: Include relevant details in logs
+3. **Performance**: Use DEBUG for verbose logs that can be disabled
+4. **Production Runs**: Use INFO or WARN level for CI/CD
 
-The framework can be easily extended with:
+### Test Organization
 
-- Visual regression testing
-- Performance testing
-- Accessibility testing
-- Data-driven testing
+1. **Feature Files**: Group related scenarios
+2. **Tags**: Use @Smoke, @Regression for test categorization
+3. **Step Reusability**: Write generic, reusable step definitions
+4. **Separation of Concerns**: Keep UI and API logic separate
 
-## 🪝 Hooks System
+## 🛠️ Troubleshooting
 
-The framework includes a powerful test hooks implementation for flexible test lifecycle management:
+### Common Issues
 
-#### Test Lifecycle Hooks
+**Issue: Tests failing due to timeouts**
+```bash
+# Increase timeout in .env file
+DEFAULT_TIMEOUT=60000
+```
+
+**Issue: Want to see detailed logs**
+```bash
+# Run with debug logging
+LOG_LEVEL=debug npm run test
+```
+
+**Issue: Need to debug specific test**
+```bash
+# Run in debug mode with UI
+npm run test:debug
+```
+
+**Issue: API context errors**
+- Ensure ServiceFactory cleanup in After hook is working
+- Check API_BASE_URL in environment configuration
+
+## 📝 Adding New Tests
+
+### Adding a New Page Object
+
+1. Create new page class extending BasePage
+2. Define locators in constructor
+3. Implement page-specific methods
+4. Use direct instantiation in step definitions
 
 ```typescript
-// Hooks for test setup and teardown
-beforeFeature(async (feature) => {
-    log.info(`Starting feature: ${feature.name}`);
-    // Setup operations before each feature
-});
+export class NewPage extends BasePage {
+    readonly someElement: Locator;
+    
+    constructor(page: Page) {
+        super(page);
+        this.someElement = page.locator('#element');
+    }
+    
+    async performAction() {
+        await this.someElement.click();
+    }
+}
+```
 
-afterFeature(async (feature) => {
-    log.info(`Completed feature: ${feature.name}`);
-    // Cleanup operations after each feature
-});
+### Adding New Step Definitions
 
-beforeScenario(async (scenario) => {
-    log.info(`Starting scenario: ${scenario.name}`);
-    // Setup operations before each scenario
-});
+1. Import required page classes
+2. Create page instances directly
+3. Implement step logic
+4. Add proper logging
 
-afterScenario(async (scenario) => {
-    log.info(`Completed scenario: ${scenario.name} with status: ${scenario.result}`);
-    // Cleanup operations after each scenario, handle different outcomes
+```typescript
+Given('I am on the new page', async ({ page }) => {
+    const newPage = new NewPage(page);
+    await newPage.goto();
+    log.info('New page loaded');
 });
 ```
+
+### Adding API Tests
+
+1. Create new API client extending BaseApiClient
+2. Register in ServiceFactory
+3. Use in step definitions
+4. Factory handles cleanup automatically
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new features
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the ISC License.
+
+## 🙏 Acknowledgments
+
+- Playwright team for excellent testing framework
+- Cucumber team for BDD support
+- Community contributors
+
+---
+
+**Built with ❤️ by the Test Automation Team**
