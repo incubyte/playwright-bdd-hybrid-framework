@@ -1,7 +1,8 @@
 import { expect, Page } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
 import dotenv from 'dotenv';
-import { PageFactory } from '../pages/PageFactory';
+import { LoginPage } from '../pages/LoginPage';
+import { DashboardPage } from '../pages/DashboardPage';
 import { ServiceFactory } from '../services/api/ServiceFactory';
 import { LoginResponse } from '../services/models/ApiModels';
 import { log } from '../utils/logger';
@@ -17,7 +18,8 @@ interface BddContext {
 
 const { Given, When, Then } = createBdd<BddContext>();
 
-let pageFactory: PageFactory;
+let loginPage: LoginPage;
+let dashboardPage: DashboardPage;
 let apiContext: any = {
     loginResponse: null as LoginResponse | null
 };
@@ -30,8 +32,7 @@ Given('I am on the login page', async ({ page }: BddContext) => {
 
     if (testType === 'UI') {
         log.info('Executing UI test: navigating to login page');
-        pageFactory = pageFactory || PageFactory.getInstance(page);
-        const loginPage = pageFactory.getLoginPage();
+        loginPage = new LoginPage(page);
         await loginPage.goto();
         await loginPage.isPageLoaded();
         log.debug('Login page loaded successfully');
@@ -51,8 +52,6 @@ When('I enter valid credentials', async ({ page }: BddContext) => {
 
     if (testType === 'UI') {
         log.info('Executing UI test: entering login credentials');
-        pageFactory = pageFactory || PageFactory.getInstance(page);
-        const loginPage = pageFactory.getLoginPage();
         await loginPage.login(username, password);
         log.debug('Credentials entered successfully');
     }
@@ -104,8 +103,7 @@ Then('I should be redirected to the dashboard', async ({ page }: BddContext) => 
 
     if (testType === 'UI') {
         log.info('Executing UI test: verifying dashboard redirection');
-        pageFactory = pageFactory || PageFactory.getInstance(page);
-        const dashboardPage = pageFactory.getDashboardPage();
+        dashboardPage = new DashboardPage(page);
 
         log.debug('Checking URL pattern matches /secure$');
         await expect(page).toHaveURL(/\/secure$/);
