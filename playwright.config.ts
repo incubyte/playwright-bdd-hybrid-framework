@@ -28,83 +28,87 @@ process.env.TEST_PASSWORD = TEST_PASSWORD;
 process.env.LOG_LEVEL = LOG_LEVEL;
 
 // Log the test type and logging level being used
+// eslint-disable-next-line no-console
 console.log(`Running tests in ${TEST_TYPE} mode with logging level: ${LOG_LEVEL}`);
 
 const testDir = defineBddConfig({
-    features: 'features/**/*.feature',
-    steps: 'src/steps/**/*.ts',
+  features: 'features/**/*.feature',
+  steps: 'src/steps/**/*.ts',
 });
 
 export default defineConfig({
-    testDir,
-    // Configure multiple reporters: HTML and Allure
-    reporter: [
-        ['html'],
-        ['allure-playwright', {
-            detail: true,
-            outputFolder: 'allure-results',
-            suiteTitle: false
-        }]
+  testDir,
+  // Configure multiple reporters: HTML and Allure
+  reporter: [
+    ['html'],
+    [
+      'allure-playwright',
+      {
+        detail: true,
+        outputFolder: 'allure-results',
+        suiteTitle: false,
+      },
     ],
-    // Enable fully parallel test execution
-    fullyParallel: true,
-    use: {
-        // Set base URL for all tests
-        baseURL: BASE_URL,
-        // Set screenshot option
-        screenshot: process.env.SCREENSHOT_ON_FAILURE === 'true' ? 'only-on-failure' : 'off',
-        // Enable trace for Allure reporting
-        trace: 'retain-on-failure',
+  ],
+  // Enable fully parallel test execution
+  fullyParallel: true,
+  use: {
+    // Set base URL for all tests
+    baseURL: BASE_URL,
+    // Set screenshot option
+    screenshot: process.env.SCREENSHOT_ON_FAILURE === 'true' ? 'only-on-failure' : 'off',
+    // Enable trace for Allure reporting
+    trace: 'retain-on-failure',
+  },
+  // Set timeout from env variable or default to 30 seconds
+  timeout: parseInt(process.env.DEFAULT_TIMEOUT || '30000'),
+
+  // Define projects with UI and API categories for better Allure reporting
+  projects: [
+    // UI Category - Contains all browser tests
+    {
+      name: 'ui-chromium',
+      testMatch: /.*\.feature/,
+      use: {
+        browserName: 'chromium',
+      },
+      metadata: {
+        type: 'UI',
+      },
     },
-    // Set timeout from env variable or default to 30 seconds
-    timeout: parseInt(process.env.DEFAULT_TIMEOUT || '30000'),
+    {
+      name: 'ui-firefox',
+      testMatch: /.*\.feature/,
+      use: {
+        browserName: 'firefox',
+      },
+      metadata: {
+        type: 'UI',
+      },
+    },
+    {
+      name: 'ui-webkit',
+      testMatch: /.*\.feature/,
+      use: {
+        browserName: 'webkit',
+      },
+      metadata: {
+        type: 'UI',
+      },
+    },
 
-    // Define projects with UI and API categories for better Allure reporting
-    projects: [
-        // UI Category - Contains all browser tests
-        {
-            name: 'ui-chromium',
-            testMatch: /.*\.feature/,
-            use: {
-                browserName: 'chromium',
-            },
-            metadata: {
-                type: 'UI'
-            }
-        },
-        {
-            name: 'ui-firefox',
-            testMatch: /.*\.feature/,
-            use: {
-                browserName: 'firefox',
-            },
-            metadata: {
-                type: 'UI'
-            }
-        },
-        {
-            name: 'ui-webkit',
-            testMatch: /.*\.feature/,
-            use: {
-                browserName: 'webkit',
-            },
-            metadata: {
-                type: 'UI'
-            }
-        },
-
-        // API Category - No browser needed
-        {
-            name: 'api',
-            testMatch: /.*\.feature/,
-            use: {
-                // Use a browser-less context for API tests
-                browserName: 'chromium',
-                headless: true
-            },
-            metadata: {
-                type: 'API'
-            }
-        }
-    ],
+    // API Category - No browser needed
+    {
+      name: 'api',
+      testMatch: /.*\.feature/,
+      use: {
+        // Use a browser-less context for API tests
+        browserName: 'chromium',
+        headless: true,
+      },
+      metadata: {
+        type: 'API',
+      },
+    },
+  ],
 });
