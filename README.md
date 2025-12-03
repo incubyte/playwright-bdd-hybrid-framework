@@ -19,6 +19,9 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
 - **Allure Reporting**: Enhanced reporting with detailed visualizations and analytics
 - **Test Organization**: Clear separation between UI and API tests
+- **Code Quality Tools**: ESLint and Prettier for consistent code standards
+- **Pre-commit Hooks**: Automated linting and formatting before commits
+
 
 ## 🚀 Getting Started
 
@@ -99,7 +102,26 @@ LOG_LEVEL=debug npm run test:api
 LOG_LEVEL=warn npm run test:ui-chrome
 ```
 
-## 🏗️ Architecture Overview
+### Code Quality
+
+```bash
+# Run linting check
+npm run lint
+
+# Fix linting issues automatically
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+```
+
+> **Note**: Pre-commit hooks automatically run linting and formatting on staged files before each commit.
+
+
+
+
+
+## �🏗️ Architecture Overview
 
 The framework is built with a layered architecture that separates concerns and promotes reusability:
 
@@ -492,6 +514,20 @@ npm run test:debug
 
 - Ensure ServiceFactory cleanup in After hook is working
 - Check API_BASE_URL in environment configuration
+
+**Issue: npm install errors or package installation failures (Windows)**
+
+If you encounter permission errors or installation failures, run these commands in **Command Prompt as Administrator**:
+
+```bash
+# Remove node_modules and package-lock.json
+rmdir /s /q node_modules
+del package-lock.json
+
+# Reinstall dependencies
+npm install
+```
+
 
 ## 📝 Adding New Tests
 
