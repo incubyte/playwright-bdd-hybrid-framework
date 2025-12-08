@@ -19,6 +19,9 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
 - **Allure Reporting**: Enhanced reporting with detailed visualizations and analytics
 - **Test Organization**: Clear separation between UI and API tests
+- **Code Quality Tools**: ESLint and Prettier for consistent code standards
+- **Pre-commit Hooks**: Automated linting and formatting before commits
+
 
 ## 🚀 Getting Started
 
@@ -99,7 +102,26 @@ LOG_LEVEL=debug npm run test:api
 LOG_LEVEL=warn npm run test:ui-chrome
 ```
 
-## 🏗️ Architecture Overview
+### Code Quality
+
+```bash
+# Run linting check
+npm run lint
+
+# Fix linting issues automatically
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+```
+
+> **Note**: Pre-commit hooks automatically run linting and formatting on staged files before each commit.
+
+
+
+
+
+## �🏗️ Architecture Overview
 
 The framework is built with a layered architecture that separates concerns and promotes reusability:
 
@@ -118,6 +140,7 @@ Feature: Sample Login
 ### 2. Step Definitions Layer
 
 Step definition files connect Gherkin steps to actual implementations using:
+
 - Direct page object instantiation for UI interactions
 - Service Factory for API client management
 - Custom assertions for verification
@@ -125,11 +148,13 @@ Step definition files connect Gherkin steps to actual implementations using:
 ### 3. UI Testing Layer (Page Objects)
 
 Page objects provide a clean abstraction over UI elements and interactions:
+
 - **BasePage**: Common utilities and methods shared across all pages
 - **LoginPage**: Login page-specific interactions and locators
 - **DashboardPage**: Dashboard/secure area page interactions
 
 **Direct Instantiation Pattern:**
+
 ```typescript
 // Pages are instantiated directly when needed
 const loginPage = new LoginPage(page);
@@ -143,6 +168,7 @@ await dashboardPage.isPageLoaded();
 ### 4. API Testing Layer (Service Clients)
 
 API clients handle backend service calls:
+
 - **BaseApiClient**: Core HTTP functionality (GET, POST, PUT, DELETE)
 - **AuthApiClient**: Authentication-specific API operations
 - **ServiceFactory**: Centralized client management with singleton pattern
@@ -150,6 +176,7 @@ API clients handle backend service calls:
 ### 5. Utilities Layer
 
 Cross-cutting concerns that support the entire framework:
+
 - **Logger**: Structured logging system with configurable levels
 - **Hooks**: Test lifecycle management for setup and teardown
 - **Configuration**: Environment-based configuration management
@@ -194,6 +221,7 @@ The Page Object Model architecture separates UI interactions from test logic usi
 #### BasePage
 
 Abstract base class with common utilities for all pages:
+
 ```typescript
 // Page loading utilities
 async waitForPageLoad() {
@@ -213,28 +241,30 @@ async verifyPageTitle(title: string) {
 #### LoginPage & DashboardPage
 
 Specialized page classes that extend BasePage:
+
 ```typescript
 // LoginPage - handles login page interactions
 export class LoginPage extends BasePage {
-    readonly usernameInput: Locator;
-    readonly passwordInput: Locator;
-    readonly loginButton: Locator;
-    
-    async login(username: string, password: string) {
-        await this.usernameInput.fill(username);
-        await this.passwordInput.fill(password);
-        await this.loginButton.click();
-    }
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
+
+  async login(username: string, password: string) {
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
+  }
 }
 ```
 
 **Usage in Step Definitions:**
+
 ```typescript
 // Direct instantiation - simple and clear
 Given('I am on the login page', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.isPageLoaded();
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.isPageLoaded();
 });
 ```
 
@@ -245,6 +275,7 @@ The API testing architecture provides a clean, modular approach to service inter
 #### BaseApiClient
 
 Foundation class for all API operations:
+
 ```typescript
 async post(url: string, options?: any): Promise<APIResponse> {
     if (!this.apiContext) {
@@ -260,6 +291,7 @@ async post(url: string, options?: any): Promise<APIResponse> {
 #### ServiceFactory
 
 Manages API client instances with singleton pattern for efficient resource usage:
+
 ```typescript
 public async getAuthApiClient(): Promise<AuthApiClient> {
     if (!this.serviceInstances.has('authApiClient')) {
@@ -278,29 +310,34 @@ public async getAuthApiClient(): Promise<AuthApiClient> {
 The framework implements Before and After hooks for test lifecycle management:
 
 #### Before Hook
+
 Executes before each test scenario for setup operations:
+
 ```typescript
 Before(async function ({ page }) {
-    log.debug('Executing Before hook');
-    // Add any setup logic here
-})
+  log.debug('Executing Before hook');
+  // Add any setup logic here
+});
 ```
 
 #### After Hook
+
 Executes after each test scenario for cleanup:
+
 ```typescript
 After(async function ({ page }) {
-    log.debug('Executing After hook for cleanup');
-    
-    // Clean up Service objects (API clients)
-    const serviceFactory = ServiceFactory.getInstance();
-    await serviceFactory.dispose();
-    
-    log.debug('After hook completed');
+  log.debug('Executing After hook for cleanup');
+
+  // Clean up Service objects (API clients)
+  const serviceFactory = ServiceFactory.getInstance();
+  await serviceFactory.dispose();
+
+  log.debug('After hook completed');
 });
 ```
 
 **Benefits of Hooks:**
+
 - Automatic resource cleanup after each test
 - Prevents memory leaks
 - Ensures test isolation
@@ -314,17 +351,18 @@ The framework includes a robust logging system for detailed test execution insig
 
 ```typescript
 export enum LogLevel {
-  DEBUG = 1,    // Most verbose - detailed debug information
-  INFO = 2,     // General information about test progress
-  WARN = 3,     // Warnings that don't fail tests but require attention
-  ERROR = 4,    // Error conditions that affect test execution
-  NONE = 5      // No logging
+  DEBUG = 1, // Most verbose - detailed debug information
+  INFO = 2, // General information about test progress
+  WARN = 3, // Warnings that don't fail tests but require attention
+  ERROR = 4, // Error conditions that affect test execution
+  NONE = 5, // No logging
 }
 ```
 
 #### Configuration Options
 
 The logging level can be configured in multiple ways:
+
 1. **Environment Variable**: Set `LOG_LEVEL` in your environment
 2. **Command Line**: Override for specific runs (`LOG_LEVEL=debug npm run test:api`)
 3. **.env File**: Default setting in your project's `.env` file
@@ -351,6 +389,7 @@ npm run report
 ```
 
 Features:
+
 - Test execution timeline
 - Pass/fail statistics
 - Screenshots on failure
@@ -379,6 +418,7 @@ npm run test:clean-run
 ```
 
 **Allure Report Features:**
+
 - Test execution trends over time
 - Test categorization by severity and features
 - Detailed test case history
@@ -450,26 +490,44 @@ npm run test:clean-run
 ### Common Issues
 
 **Issue: Tests failing due to timeouts**
+
 ```bash
 # Increase timeout in .env file
 DEFAULT_TIMEOUT=60000
 ```
 
 **Issue: Want to see detailed logs**
+
 ```bash
 # Run with debug logging
 LOG_LEVEL=debug npm run test
 ```
 
 **Issue: Need to debug specific test**
+
 ```bash
 # Run in debug mode with UI
 npm run test:debug
 ```
 
 **Issue: API context errors**
+
 - Ensure ServiceFactory cleanup in After hook is working
 - Check API_BASE_URL in environment configuration
+
+**Issue: npm install errors or package installation failures (Windows)**
+
+If you encounter permission errors or installation failures, run these commands in **Command Prompt as Administrator**:
+
+```bash
+# Remove node_modules and package-lock.json
+rmdir /s /q node_modules
+del package-lock.json
+
+# Reinstall dependencies
+npm install
+```
+
 
 ## 📝 Adding New Tests
 
@@ -482,16 +540,16 @@ npm run test:debug
 
 ```typescript
 export class NewPage extends BasePage {
-    readonly someElement: Locator;
-    
-    constructor(page: Page) {
-        super(page);
-        this.someElement = page.locator('#element');
-    }
-    
-    async performAction() {
-        await this.someElement.click();
-    }
+  readonly someElement: Locator;
+
+  constructor(page: Page) {
+    super(page);
+    this.someElement = page.locator('#element');
+  }
+
+  async performAction() {
+    await this.someElement.click();
+  }
 }
 ```
 
@@ -504,9 +562,9 @@ export class NewPage extends BasePage {
 
 ```typescript
 Given('I am on the new page', async ({ page }) => {
-    const newPage = new NewPage(page);
-    await newPage.goto();
-    log.info('New page loaded');
+  const newPage = new NewPage(page);
+  await newPage.goto();
+  log.info('New page loaded');
 });
 ```
 

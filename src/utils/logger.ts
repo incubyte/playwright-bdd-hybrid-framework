@@ -17,18 +17,27 @@ const LOG_LEVEL_MAP: { [key: string]: LogLevel } = {
 const configuredLevel: LogLevel = LOG_LEVEL_MAP[process.env.LOG_LEVEL?.toLowerCase() || 'info'];
 
 class Logger {
-  private log(level: LogLevel, message: string, ...args: any[]) {
+  private log(level: LogLevel, message: string, ...args: unknown[]) {
     if (level >= configuredLevel) {
       const timestamp = new Date().toISOString();
       const levelString = LogLevel[level];
+      // eslint-disable-next-line no-console
       console.log(`[${timestamp}] [${levelString}] - ${message}`, ...args);
     }
   }
 
-  debug(message: string, ...args: any[]) { this.log(LogLevel.DEBUG, message, ...args); }
-  info(message: string, ...args: any[]) { this.log(LogLevel.INFO, message, ...args); }
-  warn(message: string, ...args: any[]) { this.log(LogLevel.WARN, message, ...args); }
-  error(message: string, ...args: any[]) { this.log(LogLevel.ERROR, message, ...args); }
+  debug(message: string, ...args: unknown[]) {
+    this.log(LogLevel.DEBUG, message, ...args);
+  }
+  info(message: string, ...args: unknown[]) {
+    this.log(LogLevel.INFO, message, ...args);
+  }
+  warn(message: string, ...args: unknown[]) {
+    this.log(LogLevel.WARN, message, ...args);
+  }
+  error(message: string, ...args: unknown[]) {
+    this.log(LogLevel.ERROR, message, ...args);
+  }
 }
 
 export const log = new Logger();
