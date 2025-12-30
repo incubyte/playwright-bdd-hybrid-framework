@@ -20,6 +20,7 @@ build/
 # Test data
 /allure-results/
 /allure-report/
+accessibility-reports/
 
 # IDE specific files
 .idea/
