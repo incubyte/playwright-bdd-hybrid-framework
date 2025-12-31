@@ -14,6 +14,7 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Direct Page Instantiation**: Simple and straightforward page object creation
 - **Service Factory Pattern**: Efficient resource management for API components
 - **Multi-Browser Support**: Tests run on Chrome, Firefox, and Safari
+- **Accessibility Testing**: Automated WCAG 2.1 AA compliance checks with axe-core
 - **Test Hooks**: Flexible before/after hooks for setup and teardown operations
 - **Structured Logging**: Configurable logging levels with detailed insights
 - **Comprehensive Reporting**: Built-in HTML reporting with screenshots and traces
@@ -93,6 +94,9 @@ npm run test:api
 
 # Run UI and API tests in parallel
 npm run test:parallel
+
+# Run accessibility tests
+npm run test:accessibility
 
 # Clean Allure results and run tests with fresh reporting
 npm run test:clean-run
@@ -425,6 +429,45 @@ npm run test:clean-run
 - Behavior-driven test organization
 - Rich graphs and charts
 - Attachment support (screenshots, logs, videos)
+
+## ♿ Accessibility Testing
+
+The framework includes automated accessibility testing using **axe-core** to ensure WCAG 2.1 AA compliance.
+
+### Running Accessibility Tests
+
+```bash
+# Run accessibility tests
+npm run test:accessibility
+```
+
+### Features
+
+- **WCAG 2.1 AA Compliance**: Automatically checks against WCAG 2.1 Level A and AA standards
+- **Detailed HTML Reports**: Violations are documented in `accessibility-reports/` directory
+- **Flexible Testing**: Test full pages, specific components, or with custom tags
+- **BDD Integration**: Write accessibility tests in Gherkin syntax
+
+### Usage Example
+
+```gherkin
+Feature: Accessibility Testing
+
+  Scenario: Check accessibility on the login page
+    Given I am on the login page
+    Then I check for accessibility violations
+
+  Scenario: Check accessibility with specific tags
+    Given I am on the login page
+    Then I check for accessibility violations with tags "wcag2a, wcag2aa"
+```
+
+**AccessibilityHelper** provides methods to:
+- Scan entire pages or specific components
+- Apply custom WCAG tags
+- Exclude specific elements from scanning
+- Generate detailed HTML reports with violation details
+
 
 ## 🔄 Test Execution Flow
 
