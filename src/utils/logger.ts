@@ -14,7 +14,7 @@ const LOG_LEVEL_MAP: { [key: string]: LogLevel } = {
   none: LogLevel.NONE,
 };
 
-const configuredLevel: LogLevel = LOG_LEVEL_MAP[process.env.LOG_LEVEL?.toLowerCase() || 'info'];
+const configuredLevel: LogLevel = LOG_LEVEL_MAP[process.env.LOG_LEVEL?.toLowerCase() || 'info'] ?? LogLevel.INFO;
 
 class Logger {
   private log(level: LogLevel, message: string, ...args: unknown[]) {

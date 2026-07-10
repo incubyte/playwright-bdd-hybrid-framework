@@ -6,7 +6,7 @@
     "test": "npx bddgen && npx playwright test ",
     "test:headed": "npx bddgen && npx playwright test --headed",
     "test:ui": "npx bddgen && npx playwright test --ui",
-    "test:debug": "cross-env LOG_LEVEL=debug npx bddgen && cross-env LOG_LEVEL=debug npx playwright test --debug",
+    "test:debug": "npx bddgen && cross-env LOG_LEVEL=debug npx playwright test --debug",
     "test:ui-chrome": "cross-env TEST_TYPE=UI npx bddgen && cross-env TEST_TYPE=UI npx playwright test --project=ui-chromium",
     "test:ui-firefox": "cross-env TEST_TYPE=UI npx bddgen && cross-env TEST_TYPE=UI npx playwright test --project=ui-firefox",
     "test:ui-safari": "cross-env TEST_TYPE=UI npx bddgen && cross-env TEST_TYPE=UI npx playwright test --project=ui-webkit",
@@ -32,7 +32,7 @@
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
-    "allure-commandline": "^2.34.1",
+    "allure-commandline": "^3.0.0",
     "allure-playwright": "^3.3.3",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
@@ -44,7 +44,8 @@
     "lint-staged": "^15.2.10",
     "playwright-bdd": "^8.4.0",
     "prettier": "^3.4.1",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "typescript": "^5.0.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

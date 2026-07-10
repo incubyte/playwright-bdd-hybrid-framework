@@ -52,6 +52,8 @@ export default defineConfig({
   ],
   // Enable fully parallel test execution
   fullyParallel: true,
+  workers: process.env.CI ? 2 : undefined,
+  retries: process.env.CI ? 1 : 0,
   use: {
     // Set base URL for all tests
     baseURL: BASE_URL,
@@ -97,15 +99,11 @@ export default defineConfig({
       },
     },
 
-    // API Category - No browser needed
+    // API tests - no browser
     {
       name: 'api',
       testMatch: /.*\.feature/,
-      use: {
-        // Use a browser-less context for API tests
-        browserName: 'chromium',
-        headless: true,
-      },
+      use: {},
       metadata: {
         type: 'API',
       },

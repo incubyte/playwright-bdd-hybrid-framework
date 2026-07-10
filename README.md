@@ -21,6 +21,7 @@ This framework combines the power of Playwright's modern browser automation capa
 - **Test Organization**: Clear separation between UI and API tests
 - **Code Quality Tools**: ESLint and Prettier for consistent code standards
 - **Pre-commit Hooks**: Automated linting and formatting before commits
+- **CI-Ready Execution**: Automatic worker limiting and retry on failure when running in CI environments
 
 
 ## 🚀 Getting Started
@@ -46,8 +47,8 @@ Create a `.env` file in the root directory with the following structure:
 
 ```dotenv
 # User Credentials for Test Authentication
-TEST_USERNAME=tomsmith
-TEST_PASSWORD=SuperSecretPassword!
+TEST_USERNAME=your_username_here
+TEST_PASSWORD=your_password_here
 
 # Test Environment Configuration
 TEST_ENVIRONMENT=staging
@@ -64,6 +65,8 @@ DEFAULT_TIMEOUT=30000
 SCREENSHOT_ON_FAILURE=true
 VIDEO_RECORDING=false
 ```
+
+> **Required**: `TEST_USERNAME` and `TEST_PASSWORD` must be set. The framework will throw an error at startup if either is missing.
 
 ### Running Tests
 
@@ -162,7 +165,7 @@ await loginPage.goto();
 await loginPage.login(username, password);
 
 const dashboardPage = new DashboardPage(page);
-await dashboardPage.isPageLoaded();
+await dashboardPage.assertPageLoaded();
 ```
 
 ### 4. API Testing Layer (Service Clients)
@@ -220,16 +223,9 @@ The Page Object Model architecture separates UI interactions from test logic usi
 
 #### BasePage
 
-Abstract base class with common utilities for all pages:
+Abstract base class with common utilities for all pages. Page interactions use element-based waits (`waitFor`, `waitForURL`) instead of `networkidle`.
 
 ```typescript
-// Page loading utilities
-async waitForPageLoad() {
-    log.debug('Waiting for page to reach networkidle state');
-    await this.page.waitForLoadState('networkidle');
-    log.debug('Page load completed');
-}
-
 // Verification methods
 async verifyPageTitle(title: string) {
     log.debug(`Verifying page title matches "${title}"`);
@@ -264,7 +260,7 @@ export class LoginPage extends BasePage {
 Given('I am on the login page', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await loginPage.goto();
-  await loginPage.isPageLoaded();
+  await loginPage.assertPageLoaded();
 });
 ```
 
@@ -307,18 +303,7 @@ public async getAuthApiClient(): Promise<AuthApiClient> {
 
 ### Test Hooks
 
-The framework implements Before and After hooks for test lifecycle management:
-
-#### Before Hook
-
-Executes before each test scenario for setup operations:
-
-```typescript
-Before(async function ({ page }) {
-  log.debug('Executing Before hook');
-  // Add any setup logic here
-});
-```
+The framework implements an After hook for test lifecycle management:
 
 #### After Hook
 
@@ -336,12 +321,11 @@ After(async function ({ page }) {
 });
 ```
 
-**Benefits of Hooks:**
+**Benefits of the After Hook:**
 
 - Automatic resource cleanup after each test
 - Prevents memory leaks
 - Ensures test isolation
-- Consistent setup and teardown logic
 
 ### Logging System
 
@@ -430,30 +414,28 @@ npm run test:clean-run
 
 ### UI Test Flow
 
-1. **Before Hook** - Executes setup operations
-2. **Test Scenario Starts** - BDD steps begin execution
-3. **Page Instantiation** - Pages created directly as needed
+1. **Test Scenario Starts** - BDD steps begin execution
+2. **Page Instantiation** - Pages created directly as needed
    ```typescript
    const loginPage = new LoginPage(page);
    ```
-4. **Test Actions** - Interactions performed via page objects
-5. **Assertions** - Verifications using Playwright's expect
-6. **After Hook** - Cleanup of API service resources
-7. **Test Complete** - Results captured in reports
+3. **Test Actions** - Interactions performed via page objects using element-based waits
+4. **Assertions** - Verifications using Playwright's expect (`assertPageLoaded`, `verifyPageTitle`, etc.)
+5. **After Hook** - Cleanup of API service resources
+6. **Test Complete** - Results captured in reports
 
 ### API Test Flow
 
-1. **Before Hook** - Executes setup operations
-2. **Test Scenario Starts** - BDD steps begin execution
-3. **Service Factory** - API client retrieved from factory
+1. **Test Scenario Starts** - BDD steps begin execution
+2. **Service Factory** - API client retrieved from factory
    ```typescript
    const serviceFactory = ServiceFactory.getInstance();
    const authClient = await serviceFactory.getAuthApiClient();
    ```
-4. **API Calls** - HTTP requests executed
-5. **Response Validation** - Status codes and data verified
-6. **After Hook** - Cleanup of API contexts
-7. **Test Complete** - Results captured in reports
+3. **API Calls** - HTTP requests executed
+4. **Response Validation** - Status codes and data verified
+5. **After Hook** - Cleanup of API contexts
+6. **Test Complete** - Results captured in reports
 
 ## 🎯 Best Practices
 
