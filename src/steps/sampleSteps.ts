@@ -1,6 +1,5 @@
 import { expect, Page } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
-import dotenv from 'dotenv';
 import { LoginPage } from '../pages/LoginPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { ServiceFactory } from '../services/api/ServiceFactory';
@@ -9,11 +8,8 @@ import { log } from '../utils/logger';
 // Import hooks to ensure they're registered
 import '../utils/hooks';
 
-dotenv.config();
-
 interface BddContext {
   page: Page;
-  apiResponse?: unknown;
 }
 
 const { Given, When, Then } = createBdd<BddContext>();
@@ -40,7 +36,7 @@ Given('I am on the login page', async ({ page }: BddContext) => {
     log.info('Executing UI test: navigating to login page');
     loginPage = new LoginPage(page);
     await loginPage.goto();
-    await loginPage.isPageLoaded();
+    await loginPage.assertPageLoaded();
     log.debug('Login page loaded successfully');
   }
 
@@ -50,9 +46,12 @@ Given('I am on the login page', async ({ page }: BddContext) => {
 });
 
 When('I enter valid credentials', async () => {
+  apiContext.loginResponse = null;
+  apiContext.statusCode = undefined;
   const testType = process.env.TEST_TYPE;
-  const username = process.env.TEST_USERNAME!;
-  const password = process.env.TEST_PASSWORD!;
+  const username = process.env.TEST_USERNAME;
+  const password = process.env.TEST_PASSWORD;
+  if (!username || !password) throw new Error('TEST_USERNAME and TEST_PASSWORD must be set');
   log.debug(`Test type: ${testType}, Username: ${username}`);
 
   if (testType === 'UI') {
@@ -108,7 +107,7 @@ Then('I should be redirected to the dashboard', async ({ page }: BddContext) => 
 
     log.debug('Checking URL pattern matches /secure$');
     await expect(page).toHaveURL(/\/secure$/);
-    await dashboardPage.isPageLoaded();
+    await dashboardPage.assertPageLoaded();
 
     log.debug('Checking for success message visibility');
     await expect(dashboardPage.successMessage).toBeVisible();

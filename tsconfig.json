@@ -12,6 +12,6 @@
     "allowJs": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "features/**/*", "playwright.config.ts"],
+  "include": ["src/**/*", "features/**/*.ts", "playwright.config.ts"],
   "exclude": ["node_modules", "dist", "test-results", "playwright-report"]
 }

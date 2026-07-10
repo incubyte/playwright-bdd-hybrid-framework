@@ -12,14 +12,12 @@ export class DashboardPage extends BasePage {
     this.successMessage = page.locator('#flash.success');
     this.logoutButton = page.locator('a.button');
     this.pageHeading = page.locator('h2');
-    log.debug('DashboardPage initialized with locators');
   }
 
-  async isPageLoaded() {
+  async assertPageLoaded(): Promise<void> {
     log.debug('Verifying dashboard page is loaded');
     await this.verifyElementText(this.pageHeading, 'Secure Area');
     log.info('Dashboard page loaded successfully');
-    return true;
   }
 
   async getSuccessMessage() {
@@ -40,7 +38,7 @@ export class DashboardPage extends BasePage {
     log.info('Logging out from dashboard');
     await this.logoutButton.click();
     log.debug('Logout button clicked');
-    await this.waitForPageLoad();
+    await this.page.waitForURL(/\/login$/);
     log.info('Logged out successfully');
   }
 }

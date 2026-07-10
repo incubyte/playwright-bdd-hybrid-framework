@@ -1,3 +1,4 @@
+import { mkdirSync } from 'fs';
 import { Page, Locator, expect } from '@playwright/test';
 import { log } from '../utils/logger';
 
@@ -6,13 +7,6 @@ export class BasePage {
 
   constructor(page: Page) {
     this.page = page;
-    log.debug(`BasePage initialized with page object`);
-  }
-
-  async waitForPageLoad() {
-    log.debug('Waiting for page to reach networkidle state');
-    await this.page.waitForLoadState('networkidle');
-    log.debug('Page load completed');
   }
 
   async verifyPageTitle(title: string) {
@@ -29,6 +23,7 @@ export class BasePage {
 
   async takeScreenshot(name: string) {
     log.info(`Taking screenshot: ${name}`);
+    mkdirSync('./screenshots', { recursive: true });
     await this.page.screenshot({ path: `./screenshots/${name}.png` });
     log.debug(`Screenshot saved to ./screenshots/${name}.png`);
   }

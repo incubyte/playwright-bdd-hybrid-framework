@@ -5,10 +5,6 @@ import { log } from './logger';
 // Create the BDD hooks from the Playwright test instance
 export const { Before, After } = createBdd(base);
 
-Before(async function () {
-  log.debug('Executing Before hook');
-});
-
 // Register hooks for cleanup after each test
 After(async function () {
   log.debug('Executing After hook for cleanup');

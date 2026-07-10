@@ -14,8 +14,9 @@ export class ServiceFactory {
     if (!ServiceFactory.instance) {
       log.debug('Creating new ServiceFactory instance');
       ServiceFactory.instance = new ServiceFactory();
+    } else {
+      log.debug('Returning existing ServiceFactory instance');
     }
-    log.debug('Returning existing ServiceFactory instance');
     return ServiceFactory.instance;
   }
 

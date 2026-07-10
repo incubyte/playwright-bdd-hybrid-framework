@@ -16,14 +16,13 @@ export class LoginPage extends BasePage {
     this.loginButton = page.locator('button[type="submit"]');
     this.flashMessage = page.locator('#flash');
     this.pageHeading = page.locator('h2');
-    log.debug('LoginPage initialized with locators');
   }
 
   async goto() {
     log.info('Navigating to login page');
     // Using Playwright's native method directly
     await this.page.goto('/login');
-    await this.waitForPageLoad();
+    await this.loginButton.waitFor({ state: 'visible' });
     log.debug('Login page loaded');
   }
 
@@ -36,16 +35,15 @@ export class LoginPage extends BasePage {
     await this.passwordInput.fill(password);
     log.debug('Clicking login button');
     await this.loginButton.click();
-    await this.waitForPageLoad();
+    await this.page.waitForURL(/\/secure$/);
     log.info('Login form submitted');
   }
 
-  async isPageLoaded() {
+  async assertPageLoaded(): Promise<void> {
     log.debug('Verifying login page is loaded');
     // Still using BasePage's utility method for verification
     await this.verifyElementText(this.pageHeading, 'Login Page');
     log.info('Login page loaded successfully');
-    return true;
   }
 
   async getFlashMessageText() {
