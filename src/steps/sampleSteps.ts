@@ -14,8 +14,8 @@ interface BddContext {
 
 const { Given, When, Then } = createBdd<BddContext>();
 
-let loginPage: LoginPage;
-let dashboardPage: DashboardPage;
+let loginPage: LoginPage | null = null;
+let dashboardPage: DashboardPage | null = null;
 
 interface ApiContext {
   loginResponse: LoginResponse | null;

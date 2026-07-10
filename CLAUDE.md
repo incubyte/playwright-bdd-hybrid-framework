@@ -34,6 +34,15 @@ npm run lint:fix            # Auto-fix linting issues
 npm run format              # Format code with Prettier
 ```
 
+### Local Review (Claude Code)
+
+```bash
+/review-playwright          # Review staged changes against P0-P3 standards
+/review-playwright --all    # Review all changes vs HEAD
+```
+
+> Skills and reference docs live in `.claude/` — see `.claude/skills/`, `.claude/references/`, `.claude/commands/`.
+
 **Important**: Pre-commit hooks automatically run linting and formatting. All staged `.ts` and `.tsx` files are linted and formatted before commits.
 
 ### Reporting

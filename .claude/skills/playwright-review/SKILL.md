@@ -1,6 +1,6 @@
 ---
 name: playwright-review
-description: Use when reviewing Playwright BDD test files for quality issues — locally staged/modified files or PR diffs. Covers P0-P3 anti-pattern taxonomy, framework standards, report formatting, and auto-fix guidance. Triggers on: "review playwright code", "check test quality", "review before commit", staged test changes.
+description: Use when reviewing Playwright BDD test files for quality issues — locally staged/modified files or PR diffs. Triggers on: "review playwright code", "check test quality", "review before commit", staged test changes.
 ---
 
 # Playwright BDD Code Review
